@@ -1,76 +1,59 @@
-from typing import List
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-import os
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+import os #link to the os.environ.get to retrieve the uri link
 from datetime import date
+from sqlalchemy import Column   
+
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI') #used to hide sensitive information 
+
 
 class Base(DeclarativeBase):
-    pass 
+    pass
 
-db = SQLAlchemy(model_class = Base)
+db= SQLAlchemy(model_class= Base)
 
 db.init_app(app)
 
-# service_mechanics = db.Table(
-#     'service_mechanics',
-#     Base.metadata,
-#     Column('ticket_id', db.ForeignKey('service_tickets.id')),
-#     Column('mechanic_id', db.ForeignKey('mechanics.id'))
-# )
+service_mechanics = db.Table(
+    "service_mechanics",
+    Base.metadata,
+    Column("ticket_id", db.ForeignKey("service_tickets.id")),
+    Column("mechanic_id", db.ForeignKey("mechanics.id"))
+)
 
-class Customer(Base):
+class customers(Base):
     __tablename__ = 'customers'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(db.String(100), nullable=False)
-    email: Mapped[str] = mapped_column(db.String(200), nullable=False, unique=True)
-    phone: Mapped[str] = mapped_column(db.String(20),)
-    car_vin: Mapped[str] = mapped_column(db.String(100), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(db.String(80), nullable=False)##VARCHAR IN SQL BUT STR IN PYTHON
+    email: Mapped[str] = mapped_column(db.String(100), nullable=False, unique=True)
+    phone: Mapped[str] = mapped_column(db.String(20))
 
+class service_tickets(Base):
+    __tablename__ = 'service_tickets'
 
-class Mechanic(Base):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    vin: Mapped[str] = mapped_column(db.String(17), nullable=False, unique=True)
+    service_date: Mapped[date] = mapped_column(nullable=False)
+    service_desc: Mapped[str] = mapped_column(db.String(1500), nullable=False)
+    customer_id: Mapped[int] = mapped_column(db.ForeignKey('customers.id'))
+
+class mechanics(Base):
     __tablename__ = 'mechanics'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(db.String(100), nullable=False)
-    email: Mapped[str] = mapped_column(db.String(200), nullable=False, unique=True)
-    phone: Mapped[str] = mapped_column(db.String(20))
-    address: Mapped[str] = mapped_column(db.String(100), nullable=False)
-    salary: Mapped[str] = mapped_column(db.String(100), nullable=False)
-
-
-
-class ServiceTicket(Base):
-    __tablename__ = 'service_tickets'
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
-    issue_date: Mapped[date] = mapped_column(nullable=False)
-    closed_date: Mapped[date] = mapped_column(nullable=False)
-    status: Mapped[str] = mapped_column(db.String(20), nullable=False)
-    description: Mapped[str] = mapped_column(db.String(200))
-    cost: Mapped[int] = mapped_column(db.String(200)) 
-    customer_id: Mapped[int] = mapped_column(db.ForeignKey('customers.id'))
-    mechanic_id: Mapped[int] = mapped_column(db.ForeignKey('mechanics.id'))
-
-
-
-service_mechanics = db.Table(
-    'service_mechanics',
-    Base.metadata,
-    Column('ticket_id', db.ForeignKey('service_tickets.id')),
-    Column('mechanic_id', db.ForeignKey('mechanics.id'))
-)
-
+    name: Mapped[str] = mapped_column(db.String(80), nullable=False)
+    email: Mapped[str] = mapped_column(db.String(100), nullable=False, unique=True)
+    phone: Mapped[str] = mapped_column(db.String(20), nullable=False ) # requried for contact purpose 
+    salary: Mapped[float] = mapped_column(db.Float(7), nullable=False)
 
 
 if __name__ == '__main__':
 
-        with app.app_context():
-            db.create_all()
+    with app.app_context():
+        db.create_all()
 
-        app.run(debug=True)
+    app.run(debug=True)
