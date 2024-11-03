@@ -39,11 +39,11 @@ def add_mechanic(service_ticket_id, mechanic_id):
     service_ticket = Service_ticket.query(service_ticket_id)
     mechanic = Mechanic.query(mechanic_id)
 
-    # Check if mechanic is already associated with the ticket
+   
     if mechanic in service_ticket.mechanics:
         return jsonify({"message": "Mechanic is already assigned to this ticket."}), 400
     
-    # Append mechanic to the ticket
+  
     service_ticket.mechanics.append(mechanic)
     db.session.commit()
 
