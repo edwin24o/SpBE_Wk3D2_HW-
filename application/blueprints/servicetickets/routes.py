@@ -6,8 +6,10 @@ from application.models import Service_ticket, db
 from application.models import Mechanic, db
 from datetime import datetime, timedelta
 from sqlalchemy import select
+from application.extension import cache, limiter
 
 @service_tickets_bp.route('/', methods=['POST'])
+@limiter.limit('2 per hour') #limiting 2 per hour
 def create_service_ticket():
     try:
         service_ticket_data = input_service_ticket_schema.load(request.json)
@@ -21,6 +23,7 @@ def create_service_ticket():
     return service_ticket_schema.jsonify(new_service_ticket), 201
 
 @service_tickets_bp.route('/', methods=['GET'])
+@cache.cached(timeout=60)
 def get_service_tickets():
     query = select(Service_ticket)
     service_tickets = db.session.execute(query).scalars().all()
@@ -28,6 +31,7 @@ def get_service_tickets():
     return service_ticket_schema.jsonify(service_tickets), 200
 
 @service_tickets_bp.route('/<int:ticket_id>', methods=['GET'])
+@cache.cached(timeout=60)
 def get_service_ticket(service_ticket_id):
     service_ticket = Service_ticket.query(service_ticket_id)
     return service_ticket_schema.jsonify(service_ticket), 200

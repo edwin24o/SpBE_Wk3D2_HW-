@@ -4,11 +4,13 @@ from flask import request, jsonify
 from marshmallow import ValidationError
 from application.models import Customer, db
 from sqlalchemy import select
+from application.extension import limiter
 
 
 
-# /customers POST: Create Customer
+# added limit 2 per hour
 @customers_bp.route("/", methods=['POST'])
+@limiter.limit('2 per hour')
 def create_customer():
     try:
         customer_data = customer_schema.load(request.json)
