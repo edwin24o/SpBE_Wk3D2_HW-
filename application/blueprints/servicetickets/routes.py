@@ -37,7 +37,7 @@ def get_service_ticket(service_ticket_id):
     return service_ticket_schema.jsonify(service_ticket), 200
 
 
-# adding mechanic
+
 @service_tickets_bp.route('/<int:service_ticket_id>/add_mechanic/<int:mechanic_id>', methods=['POST'])
 def add_mechanic(service_ticket_id, mechanic_id):
     service_ticket = Service_ticket.query(service_ticket_id)
