@@ -1,0 +1,468 @@
+swagger: '2.0'
+info:
+  title: "Mechanic API"
+  description: "API to manage mechanic services"
+  version: "1.0.0"
+host: "127.0.0.1:5000" 
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
+paths: 
+  /members/login:
+    post:
+      tags:
+        - Customers
+      summary: "Endpoint to login a user, (generates token)"
+      description: "Validates customer credentials, generates and return a member specific token"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Login Credentials"
+          required: true
+          schema:
+            $ref: "#/definitions/LoginPayload"
+      responses:
+        200:
+          description: "Successful Login"
+          schema: 
+            $ref: "#/definitions/LoginResponse"
+          examples:
+            application/json:
+              token: "kjsbvpiuahsenASDKLJASDKBASKDHI..."
+              message: "successfully logged in"
+              status: "success"
+
+  /members: 
+    post: 
+      tags:
+        - Customers
+      summary: "Endpoint to create/register a new user."
+      description: "Endpoint to create a new custoemr in our Mechanic Service system, emails must be unique."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new Customer."
+          required: true
+          schema:
+            $ref: "#/definitions/CreateCustomerPayload"
+      responses:
+        201:
+          descriptions: "Successfull Customer Creation"
+          schema:
+            $ref: "#/definitions/CreateCustomerResponse"
+          examples:
+            application/json:
+              id: 1
+              name: John Doe
+              phone: 123-456-7890
+              email: johnd@email.com
+              password: password123
+              role: admin
+  
+    put: 
+        tags:
+          - Customers
+        summary: "Endpoint to Update customer information."
+        description: "Endpoint to update a new costumer, requires a token. Leave fields you do not wish to update blank."
+        security:
+          - bearerAuth: []
+        parameters:
+          - in: "body"
+            name: "body"
+            description: "Information required to update a costumer."
+            required: true
+            schema:
+              $ref: "#/definitions/UpdateCostumerPayload"
+        responses:
+          200:
+            descriptions: "Successfully Updated Costumer"
+            schema:
+              $ref: "#/definitions/UpdateCostumerResponse"
+            examples:
+              application/json:
+                id: 1
+                name: John Diddly
+                phone: 123-456-7890
+                email: johnd@email.com
+                password: password123
+                role: admin
+          
+
+  /mechanics:
+    post: 
+      tags:
+        - Mechanics
+      summary: "Endpoint to create new mechanics"
+      description: "Endpoint to create a new mechanics profile in our mechanic shop database"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "information required to create mechanics"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateMechanicsPayload"
+      responses:
+        201: 
+          description: "Success, mechanic profile has been created"
+          schema:
+            $ref: "#/definitions/CreateMechanicsReponse"
+          examples:
+            application/json:
+              id: 1
+              name: Jim Doe
+              phone: 575-558-6698
+              email: JD@email.com
+              salary: $80,000.00
+
+    get:
+      tags:
+        - Mechanics
+      summary: "Endpoint to retrieve all Mechanics"
+      description: "Endpoint to retrieved all mechanics."
+      responses:
+        200:
+          description: " All mechanics will be displayed."
+          schema:
+            $ref: "#/definitions/GetMechanicsResponse"
+
+
+
+  /mechanics/mechanic_id:
+    get:
+      tags:
+        - Mechanics
+      summary: "Endpoint to retrieve specific mechanic."
+      description: "Endpoint to retrieve specific mechanic based on the mechanic id.."
+      responses:
+        200:
+          description: " selected mechanic will be displayed."
+          schema:
+            $ref: "#/definitions/GetMechanicsResponse"
+
+    put: 
+      tags:
+        - Mechanics
+      summary: "Endpoint to update mechanics infromation."
+      description: "Endpoint to update a new/existing mechanics, Note: Leave fields you do not wish to update blank."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "information required to create mechanics (Note: Leave fields you do not wish to update blank.)."
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateMechanicsPayload"
+      responses:
+        200: 
+          description: "Success, mechanic profile has been updated"
+          schema:
+            $ref: "#/definitions/UpdateMechanicsReponse"
+          examples:
+            application/json:
+              id: 1
+              name: Jim Doe
+              phone: 575-558-6698
+              email: JD@email.com
+              salary: $85,000.00  
+
+    delete: 
+      tags:
+        - Mechanics
+      summary: "Endpoint to delete mechanics infromation."
+      description: "Endpoint to delete a new/existing mechanics."
+      responses:
+        201: 
+          description: "Successful, Mechanic has been deleted"
+          schema:
+            $ref: "#/definitions/DeleteMechanicsReponse"
+
+
+
+  /service_tickets:
+    post: 
+      tags:
+        - Service tickets
+      summary: "Endpoint to create new service tickets"
+      description: "Endpoint to create new service tickets in our mechanic shop database"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "information required to create service tickets"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateService_ticketsPayload"
+      responses:
+        201: 
+          description: "Success, service ticket created"
+          schema:
+            $ref: "#/definitions/CreateService_ticketsReponse"
+          examples:
+            application/json:
+              id: 1
+              vin: Jim Doe
+              service_date: 11-06-2024
+              service_desc: customer request an oil change
+              customer_id: 2
+
+    get:
+      tags:
+        - Service tickets
+      summary: "Endpoint to get all existing Service Tickets "
+      description: "Endpoint to display all service tickets within the our mechanic shop database "
+      responses:
+        200:
+          description: "all service tickets will be displayed."
+          schema:
+            $ref: "#/definitions/GetService_ticketsReponse"
+
+
+  /service_tickets/service_ticket_id:
+    put: 
+      tags:
+        - Service tickets
+      summary: "Endpoint to update new/existing service tickets"
+      description: "Endpoint to update a new/existing service tickets, Note: Leave fields you do not wish to update blank."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "information required to update service tickets, (Note: Leave fields you do not wish to update blank.)"
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateService_ticketsPayload"
+      responses:
+        200: 
+          description: "Success, service ticket has been updated"
+          schema:
+            $ref: "#/definitions/UpdateService_ticketsReponse"
+          examples:
+            application/json:
+              id: 1
+              vin: Jim Doe
+              service_date: 11-06-2024
+              service_desc: customer request an oil change
+              customer_id: 2
+
+    get:
+      tags:
+        - Service tickets
+      summary: "Endpoint to retrieve a specific Service Ticket "
+      description: "Endpoint to retrieve specific service tickets based on the service ticket id "
+      responses:
+        200:
+          description: "selected service ticket will be displayed."
+          schema:
+            $ref: "#/definitions/GetService_ticketsReponse"
+  
+
+    delete: 
+      tags:
+        - Service tickets
+      summary: "Endpoint to delete service ticket infromation."
+      description: "Endpoint to delete a new/existing service tickets."
+      responses:
+        201: 
+          description: "Successful, service ticket has been deleted"
+          schema:
+            $ref: "#/definitions/DeleteService_ticketsResponse"
+
+
+definitions: 
+
+  LoginPayload:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+      
+    required:
+      - email
+      - password
+    
+  LoginResponse:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+      message:
+        type: "string"
+      status:
+        type: "string"
+      
+    
+     
+  CreateMechanicPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      password:
+        type: "string"
+      role:
+        type: "string"
+        description: "admin or general"
+    required:
+      - name
+      - email
+      - phone
+      - password
+      - role
+
+  CreateMechanicResponse:
+    type: "object"
+    properties:
+      id:
+        type: "int"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      password:
+        type: "string"
+      role:
+        type: "string"
+
+  UpdateMechanicPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      password:
+        type: "string"
+    required:
+      - name
+      - email
+      - phone
+      - password
+  
+
+  GetMechanicsResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      salary:
+        type: "string"
+
+
+
+  DeleteMechanicsReponse:
+    type: "object"
+    properties:
+      Message:
+        type: "string"
+
+
+
+CreateService_ticketsPayload:
+    type: "object"
+    properties:
+      vin:
+        type: "string"
+      service_date:
+        type: "date"
+      service_desc:
+        type: "string"
+      customer_id:
+        type: "integer"
+        
+    required:
+      - vin
+      - service_date
+      - service_desc
+      - customer_id
+
+  CreateService_ticketsReponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      vin:
+        type: "string"
+      service_date:
+        type: "date"
+      service_desc:
+        type: "string"
+      customer_id:
+        type: "integer"
+        
+
+
+  UpdateService_ticketsPayload:
+    type: "object"
+    properties:
+      vin:
+        type: "string"
+      service_date:
+        type: "date"
+      service_desc:
+        type: "string"
+      customer_id:
+        type: "integer"
+      
+    required:
+      - vin
+      - service_date
+      - service_desc
+      - customer_id
+
+  UpdateService_ticketsReponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      vin:
+        type: "string"
+      service_date:
+        type: "date"
+      service_desc:
+        type: "string"
+      customer_id:
+        type: "integer"
+      
+
+  GetService_ticketsReponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      vin:
+        type: "string"
+      service_date:
+        type: "date"
+      service_desc:
+        type: "string"
+      customer_id:
+        type: "integer"
+
+  DeleteService_ticketsResponse:
+    type: "object"
+    properties:
+      message:
+       type: "string"
